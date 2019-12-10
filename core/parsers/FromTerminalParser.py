@@ -21,7 +21,7 @@ class FromTerminalParser(AbstractParser):
         elif buf[0:8] == b'A0070002':
             return 'eeeeeeeeeeeeeee'
         elif buf[0:8] == b'009F0000':
-            return 'Чек 3 Толстрый 2'
+            return 'Чек 3 Толстый 2'
         elif buf[0:8] == b'009F009B':
             return 'Нет денег.'
         elif buf[0:8] == b'A0050004':
