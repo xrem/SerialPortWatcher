@@ -29,4 +29,4 @@ class FromTerminalParser(AbstractParser):
         elif buf[0:8] == b'00050000':
             return 'hhhhhhhhhhhhhhh'
         else:
-            return '<Unknown sequence>: ' + str(buf)
+            return '<Unknown sequence>: '

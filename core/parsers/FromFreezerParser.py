@@ -24,5 +24,7 @@ class FromFreezerParser(AbstractParser):
             return 'Чек 1 : нет денег'
         elif buf[0:8] == b'A0140003':
             return 'Завершено'
+        elif len(buf) >= 20 and buf[0:20] == b'6D33000000000000000D':
+            return 'Возврат'
         else:
-            return '<Unknown sequence>: ' + str(buf)
+            return '<Unknown sequence>: '

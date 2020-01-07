@@ -63,25 +63,30 @@ class Watcher():
     def __enqueueMessage__(self):
         self.__msgQueue__.put_nowait(self.__buffer__)
 
-    async def __queueWatchCoro__(self) -> str:
+    async def __queueWatchCoro__(self) -> dict:
         message = "No data"
+        buffer = b''
         try:
             buffer = self.__msgQueue__.get(timeout=10)
             message = self.__parser__.parse(buffer)
         except EmptyQueueException:
             self.log('EmptyQueueException Raised')
         finally:
-            return message
+            if 'Unknown sequence' in message:
+                return {'status': message, 'buffer': str(buffer)}
+            else:
+                return {'status': message}
+
 
     async def __queueWatchTask__(self):
         while 1:
             task = asyncio.ensure_future(self.__queueWatchCoro__())
-            result: str = await task
+            data: dict = await task
             if self.verbose:
-                self.log(result)
+                self.log(data)
             if self.__sio__.connected:
                 try:
-                    await self.__sio__.emit('event', data={'status': result}, namespace=self.__nsp__)
+                    await self.__sio__.emit('event', data=data, namespace=self.__nsp__)
                 except Exception as e:
                     console_log('Emit error: ' + str(e))
                     self.__halt__ = True
@@ -108,6 +113,7 @@ class Watcher():
         asyncio.ensure_future(self.__initializeSocketIOConnection__(), loop=loop)
         loop.run_forever()
 
+    # noinspection PyUnreachableCode
     def mainloop(self):
         self.log('Initializing...')
         queueWatcherThread = threading.Thread(target=self.__queueWatchWorker__)
@@ -149,5 +155,6 @@ class Watcher():
 
         self.log('Halt')
         sys.exit(-2)
+
         queueWatcherThread.join()
         socketIOThread.join()
