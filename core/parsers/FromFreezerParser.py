@@ -1,17 +1,22 @@
 from .AbstractParser import AbstractParser
+from .MessageTypeEnum import MessageTypeEnum
+
 
 class FromFreezerParser(AbstractParser):
+    __idle__ = 'Выберите товар'
+    __extendedWait__ = 'Что-то долго'
+    __refund__ = 'Refund'
 
     def __init__(self):
         pass
 
     def parse(self, buf: bytes) -> str:
         if buf == b'EF010000EC':
-            return 'Выберите товар'
-        elif buf[0:8] == b'6D330064':
+            return self.__idle__
+        elif buf[0:6] == b'6D3300' and buf[7:8] != b'00':
             return 'Поднесите карту к терминалу'
         elif buf[0:8] == b'00050035':
-            return 'Что-то долго'
+            return self.__extendedWait__
         elif buf[0:8] == b'00050000':
             return 'Оплата'
         elif buf[0:8] == b'00050100':
@@ -25,6 +30,17 @@ class FromFreezerParser(AbstractParser):
         elif buf[0:8] == b'A0140003':
             return 'Завершено'
         elif len(buf) >= 20 and buf[0:20] == b'6D33000000000000000D':
-            return 'Возврат'
+            return self.__refund__
         else:
-            return '<Unknown sequence>: '
+            return '<Unknown sequence>'
+
+    def get_type(self,  message: str) -> MessageTypeEnum:
+        if message == self.__idle__:
+            return MessageTypeEnum.Idle
+        if message == self.__extendedWait__:
+            return MessageTypeEnum.ExtendedWait
+        if message == self.__refund__:
+            return MessageTypeEnum.Refund
+        if 'Unknown sequence' not in message:
+            return MessageTypeEnum.Nop
+        return MessageTypeEnum.Unknown

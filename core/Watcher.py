@@ -72,10 +72,11 @@ class Watcher():
         except EmptyQueueException:
             self.log('EmptyQueueException Raised')
         finally:
+            msg_type = int(self.__parser__.get_type(message).value)
+            data = {'status': message, 'type': msg_type}
             if 'Unknown sequence' in message:
-                return {'status': message, 'buffer': str(buffer)}
-            else:
-                return {'status': message}
+                data['buffer'] = str(buffer)
+            return data
 
 
     async def __queueWatchTask__(self):
