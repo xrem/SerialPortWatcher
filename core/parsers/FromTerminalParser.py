@@ -6,6 +6,7 @@ class FromTerminalParser(AbstractParser):
     __idle__ = 'Готов. Выберите товар.'
     __failed__ = 'Нет денег.'
     __success__ = 'Чек 3 Толстый 2'
+    __wait__ = 'Поднесите карту'
 
     def __init__(self):
         pass
@@ -14,7 +15,7 @@ class FromTerminalParser(AbstractParser):
         if buf == b'01000003':
             return self.__idle__
         elif buf[0:8] == b'A00D0001':
-            return 'Поднесите карту'
+            return self.__wait__
         elif buf[0:8] == b'A0070002':
             return 'Оплата'
         elif buf[0:8] == b'A0990003':
@@ -43,6 +44,8 @@ class FromTerminalParser(AbstractParser):
             return MessageTypeEnum.Failed
         if message == self.__success__:
             return MessageTypeEnum.Success
+        if message == self.__wait__:
+            return MessageTypeEnum.WaitingCard
         if 'Unknown sequence' not in message:
             return MessageTypeEnum.Nop
         return MessageTypeEnum.Unknown

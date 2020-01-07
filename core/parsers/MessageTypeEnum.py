@@ -12,3 +12,4 @@ class MessageTypeEnum(IntEnum):
     Refund = 4
     Nop = 5
     ExtendedWait = 6
+    WaitingCard = 7

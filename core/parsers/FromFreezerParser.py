@@ -6,6 +6,7 @@ class FromFreezerParser(AbstractParser):
     __idle__ = 'Выберите товар'
     __extendedWait__ = 'Что-то долго'
     __refund__ = 'Refund'
+    __wait__ = 'Поднесите карту к терминалу'
 
     def __init__(self):
         pass
@@ -14,7 +15,7 @@ class FromFreezerParser(AbstractParser):
         if buf == b'EF010000EC':
             return self.__idle__
         elif buf[0:6] == b'6D3300' and buf[7:8] != b'00':
-            return 'Поднесите карту к терминалу'
+            return self.__wait__
         elif buf[0:8] == b'00050035':
             return self.__extendedWait__
         elif buf[0:8] == b'00050000':
@@ -41,6 +42,8 @@ class FromFreezerParser(AbstractParser):
             return MessageTypeEnum.ExtendedWait
         if message == self.__refund__:
             return MessageTypeEnum.Refund
+        if message == self.__wait__:
+            return MessageTypeEnum.WaitingCard
         if 'Unknown sequence' not in message:
             return MessageTypeEnum.Nop
         return MessageTypeEnum.Unknown
