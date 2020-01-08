@@ -67,7 +67,7 @@ class Watcher():
         message = "No data"
         buffer = b''
         try:
-            buffer = self.__msgQueue__.get(timeout=10)
+            buffer = self.__msgQueue__.get(timeout=5)
             message = self.__parser__.parse(buffer)
         except EmptyQueueException:
             self.log('EmptyQueueException Raised')
